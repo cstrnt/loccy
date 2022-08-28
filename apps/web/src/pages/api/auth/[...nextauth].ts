@@ -12,9 +12,7 @@ import { signIn } from "next-auth/react";
 export const authOptions: NextAuthOptions = {
   // Configure one or more authentication providers
   adapter: PrismaAdapter(prisma),
-  pages: {
-
-  },
+  secret: process.env.NEXT_AUTH_SECRET,
   events: {
     // Create first event on user creation
     async linkAccount({ user }) {

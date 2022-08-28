@@ -5,10 +5,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:prod": "pnpm prisma migrate deploy && pnpm run build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "prisma generate",
-    "start:prod": "pnpm prisma migrate prod && pnpm start"
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@chakra-ui/react": "^2.2.9",
