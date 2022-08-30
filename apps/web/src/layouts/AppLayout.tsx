@@ -10,22 +10,21 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { PropsWithChildren } from "react";
 import { BiBuoy, BiCog, BiHome, BiKey } from "react-icons/bi";
+import { useI18n } from "~/utils/locales";
 import { AccountSwitcher } from "../components/AppLayout/AccountSwitcher";
 import { NavItem } from "../components/AppLayout/NavItem";
 
-const getUrl = (projectId: string, newPath: string) => {
-  if (typeof window === "undefined") return "/";
-  const currentUrl = new URL(window.location.href);
-  currentUrl.pathname = `/app/${projectId}/${newPath}`;
-  return currentUrl.href;
+const useGetUrl = (newPath: string) => {
+  const router = useRouter();
+  const projectId = router.query.projectId;
+  if (!projectId || typeof projectId !== "string") return "/";
+  const searchParams = new URLSearchParams(router.asPath.split("?")[1]);
+  return `/app/${projectId}/${newPath}?${searchParams.toString()}`;
 };
 
-export const AppLayout = ({
-  children,
-  title,
-}: PropsWithChildren<{ title?: string }>) => {
+export const AppLayout = ({ children }: PropsWithChildren) => {
+  const { t } = useI18n();
   const router = useRouter();
-  const projectId = router.query.projectId as string;
 
   return (
     <Box height="100vh" overflow="hidden" position="relative">
@@ -35,18 +34,18 @@ export const AppLayout = ({
             <AccountSwitcher />
             <Stack spacing="8" flex="1" overflow="auto" pt="8">
               <Stack spacing="1">
-                <Link href={getUrl(projectId, "translations")} passHref>
+                <Link href={useGetUrl("translations")} passHref>
                   <NavItem
                     active={router.asPath.includes("/translations")}
                     icon={<BiHome />}
-                    label="Home"
+                    label={t("home")}
                   />
                 </Link>
-                <Link href={getUrl(projectId, "secrets")} passHref>
+                <Link href={useGetUrl("secrets")} passHref>
                   <NavItem
                     active={router.asPath.includes("/secrets")}
                     icon={<BiKey />}
-                    label="Secrets"
+                    label={t("secrets")}
                   />
                 </Link>
               </Stack>
@@ -66,19 +65,19 @@ export const AppLayout = ({
             </Stack>
             <Box>
               <Stack spacing="1">
-                <Link href={getUrl(projectId, "settings")} passHref>
+                <Link href={useGetUrl("settings")} passHref>
                   <NavItem
                     subtle
                     icon={<BiCog />}
                     active={router.asPath.includes("/secrets")}
-                    label="Settings"
+                    label={t("settings")}
                   />
                 </Link>
                 <Link href="/help">
                   <NavItem
                     subtle
                     icon={<BiBuoy />}
-                    label="Help & Support"
+                    label={t("help")}
                     endElement={<Circle size="2" bg="blue.400" />}
                   />
                 </Link>
@@ -88,11 +87,6 @@ export const AppLayout = ({
         </Box>
         <Box bg={mode("white", "gray.800")} flex="1" p="6">
           <Box w="full" h="full" rounded="lg" overflowY="auto" p={6}>
-            {title != null && (
-              <Heading size="md" mb={6}>
-                {title}
-              </Heading>
-            )}
             {children}
           </Box>
         </Box>

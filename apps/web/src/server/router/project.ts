@@ -100,4 +100,25 @@ export const projectRouter = createRouter()
 
       return apiKey;
     },
+  })
+  .mutation("revokeApikey", {
+    input: z.object({
+      projectId: z.string(),
+      keyId: z.string(),
+    }),
+    async resolve({ input: { keyId, projectId }, ctx }) {
+      await ctx.prisma.project.findFirst({
+        where: {
+          id: projectId,
+          apiKeys: {
+            some: { id: keyId },
+          },
+        },
+      });
+      await ctx.prisma.apiKey.delete({
+        where: {
+          id: keyId,
+        },
+      });
+    },
   });

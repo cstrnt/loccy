@@ -74,6 +74,15 @@ export default async function pushConfigHandler(
     )
   );
 
+  // TODO: remove missing keys (aka. deleted ones) ?
+  // prisma.localeKey.deleteMany({
+  //   where: {
+  //     name: { notIn: [] },
+  //     branchName,
+  //     branchProjectId: currentBranch.projectId,
+  //   },
+  // });
+
   await Promise.all(
     Object.entries(keys).map(([key, { description, params }]) =>
       prisma.localeKey.upsert({

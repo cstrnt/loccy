@@ -9,7 +9,8 @@ export function generateLocales(config: LocaleFile) {
         `${getLoccyRemoteUrl()}/api/locales/${config.projectId}/${localeKey}`
       )
         .then((r) => r.json())
-        .then((e) => ({ default: e }));
+        .then((e) => ({ default: e }))
+        .catch(() => ({ default: {} }));
     return acc;
   }, {});
 }

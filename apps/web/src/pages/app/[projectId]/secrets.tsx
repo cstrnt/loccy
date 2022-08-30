@@ -1,12 +1,21 @@
-import { Flex, Heading, IconButton, Stack, useToast } from "@chakra-ui/react";
+import {
+  Flex,
+  Heading,
+  IconButton,
+  Stack,
+  StackDivider,
+  useToast,
+  VStack,
+} from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { ReactElement } from "react";
-import { BiPlus } from "react-icons/bi";
-import { useI18n } from "~/utils/locales";
+import { BiPlus, BiTrash } from "react-icons/bi";
+import { getLocaleProps, useI18n } from "~/utils/locales";
 import { AppLayout } from "../../../layouts/AppLayout";
 import { trpc } from "../../../utils/trpc";
 
 export default function SecretsPage() {
+  const context = trpc.useContext();
   const { t } = useI18n();
   const toast = useToast();
   const router = useRouter();
@@ -18,20 +27,47 @@ export default function SecretsPage() {
     },
   ]);
 
-  const { mutateAsync } = trpc.useMutation(["projects.createApiKey"]);
+  const { mutateAsync: remoteCreateApiKey } = trpc.useMutation([
+    "projects.createApiKey",
+  ]);
+  const { mutateAsync: remoteRevokeApikey } = trpc.useMutation([
+    "projects.revokeApikey",
+  ]);
 
   const createApiKey = async () => {
     if (typeof router.query.projectId !== "string") return;
-    const key = await mutateAsync({ projectId: router.query.projectId });
+    const key = await remoteCreateApiKey(
+      { projectId: router.query.projectId },
+      {
+        onSuccess() {
+          context.invalidateQueries(["projects.apiKeys"]);
+        },
+      }
+    );
     console.log(key);
   };
 
-  console.log(data);
+  const revokeApikey = async (id: string) => {
+    if (typeof router.query.projectId !== "string") return;
+    remoteRevokeApikey(
+      { projectId: router.query.projectId, keyId: id },
+      {
+        onSuccess() {
+          toast({
+            status: "success",
+            position: "bottom-right",
+            title: t("apiKeyRevokeSuccess"),
+          });
+          context.invalidateQueries(["projects.apiKeys"]);
+        },
+      }
+    );
+  };
   return (
     <>
       <Stack>
         <Flex justifyContent="space-between">
-          <Heading size="md">Api Keys</Heading>
+          <Heading size="md">{t("secrets")}</Heading>
           <IconButton
             aria-label={t("createApiKey")}
             title={t("createApiKey")}
@@ -39,16 +75,25 @@ export default function SecretsPage() {
             onClick={createApiKey}
           />
         </Flex>
-        <Stack>
+        <VStack divider={<StackDivider borderColor="gray.200" />}>
           {data?.map((apiKey) => (
             <Flex key={apiKey.id}>
-              {apiKey.name} | {apiKey.hashedKey}
+              {apiKey.name} | {apiKey.hashedKey}{" "}
+              <IconButton
+                aria-label={t("revokeApikey")}
+                title={t("revokeApikey")}
+                icon={<BiTrash />}
+                colorScheme="red"
+                onClick={() => revokeApikey(apiKey.id)}
+              />
             </Flex>
           ))}
-        </Stack>
+        </VStack>
       </Stack>
     </>
   );
 }
 
 SecretsPage.getLayout = (page: ReactElement) => <AppLayout>{page}</AppLayout>;
+
+export const getServerSideProps = getLocaleProps();

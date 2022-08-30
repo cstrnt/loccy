@@ -5,6 +5,7 @@ import {
   FormErrorMessage,
   FormHelperText,
   FormLabel,
+  Heading,
   Input,
   Select,
   Stack,
@@ -17,10 +18,12 @@ import { AppLayout } from "../../../layouts/AppLayout";
 import { trpc } from "../../../utils/trpc";
 import { useForm } from "react-hook-form";
 import { LocaleKey } from "@prisma/client";
+import { getLocaleProps, useI18n } from "~/utils/locales";
 
-export default function MePage() {
+export default function TranslationsPage() {
   const toast = useToast();
   const router = useRouter();
+  const { t } = useI18n();
 
   const { register, setError, formState, setValue, reset } = useForm({
     mode: "onChange",
@@ -115,37 +118,39 @@ export default function MePage() {
       toast({
         position: "bottom-right",
         status: "success",
-        title: "Saved",
+        title: t("saved"),
       });
       refetch();
     } catch (e) {
       toast({
         position: "bottom-right",
         status: "error",
-        title: "Could not update translation",
+        title: t("localeSaveError"),
       });
     }
   };
 
   return (
     <>
-      <Flex>
-        <Select
-          value={currentLocaleName}
-          onChange={(e) =>
-            router.push({
-              ...router,
-              query: { ...router.query, locale: e.target.value },
-            })
-          }
-        >
-          {data?.locales.map((locale) => (
-            <option key={locale.name} value={locale.name}>
-              {locale.name}
-            </option>
-          ))}
-        </Select>
-      </Flex>
+      <Heading size="md" mb={6}>
+        {t("translations")}
+      </Heading>
+      <Select
+        value={currentLocaleName}
+        onChange={(e) =>
+          router.push({
+            ...router,
+            query: { ...router.query, locale: e.target.value },
+          })
+        }
+      >
+        {data?.locales.map((locale) => (
+          <option key={locale.name} value={locale.name}>
+            {locale.name}
+          </option>
+        ))}
+      </Select>
+
       <Stack spacing={8}>
         {Array.from(data?.localeKeys ?? [])
           .sort((a, b) => a.name.localeCompare(b.name))
@@ -179,6 +184,8 @@ export default function MePage() {
   );
 }
 
-MePage.getLayout = (page: ReactElement) => (
-  <AppLayout title="Translations">{page}</AppLayout>
+TranslationsPage.getLayout = (page: ReactElement) => (
+  <AppLayout>{page}</AppLayout>
 );
+
+export const getServerSideProps = getLocaleProps();
