@@ -1,3 +1,4 @@
+import { Locale } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 import NextCors from "nextjs-cors";
 import { z } from "zod";
@@ -25,15 +26,36 @@ export default async function handler(
 
     const params = paramsSchema.parse(req.query);
     const { projectId, locale, branchName, type } = params;
-    const persistedLocale = await prisma.locale.findFirst({
+
+    // TODO: CACHE IF BRANCH EXISTS?
+    let persistedLocale: Locale | null = null;
+
+    persistedLocale = await prisma.locale.findFirst({
       where: {
         branch: {
-          name: branchName ?? ProjectService.DEFAULT_BRANCH_NAME,
+          name: branchName,
           projectId: projectId,
         },
         name: locale,
       },
     });
+
+    if (!persistedLocale) {
+      persistedLocale = await prisma.locale.findFirst({
+        where: {
+          branch: {
+            name:
+              // no given branch name or no locale found for given branch
+              !branchName || !persistedLocale
+                ? ProjectService.DEFAULT_BRANCH_NAME
+                : branchName,
+            projectId: projectId,
+          },
+          name: locale,
+        },
+      });
+    }
+
     if (!persistedLocale) {
       res.status(404).json({ error: "Locale not found" });
       return;

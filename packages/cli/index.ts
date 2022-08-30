@@ -1,4 +1,4 @@
-type LocaleFile<T extends string = string> = {
+type LocaleFile = {
   locales: string[];
   defaultLocale?: string;
   keys: Record<string, Record<string, string>>;

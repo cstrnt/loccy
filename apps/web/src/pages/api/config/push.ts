@@ -2,20 +2,15 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
 import { ProjectService } from "~/server/services/ProjectService";
 import { prisma } from "../../../server/db/client";
+import { localeFileSchema } from "@loccy/shared";
 
-const incomingSchema = z.object({
-  // TODO: REMOVE!!
-  projectId: z.string(),
-  locales: z.array(z.string()),
-  defaultLocale: z.string(),
-  branchName: z.string().default(ProjectService.DEFAULT_BRANCH_NAME),
-  keys: z.object({}).catchall(
-    z.object({
-      description: z.string().optional(),
-      params: z.object({}).catchall(z.string()).optional(),
-    })
-  ),
-});
+const incomingSchema = localeFileSchema.merge(
+  z.object({
+    branchName: z.string().default(ProjectService.DEFAULT_BRANCH_NAME),
+  })
+);
+// TODO: REMOVE projectId
+// .omit({ projectId: true });
 
 export default async function pushConfigHandler(
   req: NextApiRequest,

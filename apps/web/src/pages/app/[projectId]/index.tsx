@@ -147,31 +147,33 @@ export default function MePage() {
         </Select>
       </Flex>
       <Stack px={6} spacing={8}>
-        {data?.localeKeys.map(({ name, description, params }) => (
-          <FormControl
-            key={`${name}-${currentLocaleName}`}
-            isInvalid={
-              !!formState.errors[LocaleService.cleanLocaleKeyName(name)]
-            }
-          >
-            <FormLabel>{name}</FormLabel>
-            <Input
-              {...register(LocaleService.cleanLocaleKeyName(name), {
-                required: "Required",
-                validate: (value) => validateKey(value, name).message,
-                onBlur: (e) => updateKey(e.target.value, name),
-              })}
-            />
-            <FormHelperText>{description}</FormHelperText>
-            <FormErrorMessage>
-              {formState.errors?.[LocaleService.cleanLocaleKeyName(name)] !=
-              null
-                ? (formState.errors?.[LocaleService.cleanLocaleKeyName(name)]
-                    ?.message as any)
-                : null}
-            </FormErrorMessage>
-          </FormControl>
-        ))}
+        {Array.from(data?.localeKeys ?? [])
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map(({ name, description, params }) => (
+            <FormControl
+              key={`${name}-${currentLocaleName}`}
+              isInvalid={
+                !!formState.errors[LocaleService.cleanLocaleKeyName(name)]
+              }
+            >
+              <FormLabel>{name}</FormLabel>
+              <Input
+                {...register(LocaleService.cleanLocaleKeyName(name), {
+                  required: "Required",
+                  validate: (value) => validateKey(value, name).message,
+                  onBlur: (e) => updateKey(e.target.value, name),
+                })}
+              />
+              <FormHelperText>{description}</FormHelperText>
+              <FormErrorMessage>
+                {formState.errors?.[LocaleService.cleanLocaleKeyName(name)] !=
+                null
+                  ? (formState.errors?.[LocaleService.cleanLocaleKeyName(name)]
+                      ?.message as any)
+                  : null}
+              </FormErrorMessage>
+            </FormControl>
+          ))}
       </Stack>
     </>
   );
