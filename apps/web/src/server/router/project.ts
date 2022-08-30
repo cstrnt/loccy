@@ -67,4 +67,37 @@ export const projectRouter = createRouter()
         },
       });
     },
+  })
+  .query("apiKeys", {
+    input: z.object({
+      projectId: z.string(),
+    }),
+    async resolve({ input: { projectId }, ctx }) {
+      await ProjectService.hasAccessToProject({
+        ctx,
+        projectId: projectId,
+      });
+      return ctx.prisma.apiKey.findMany({
+        where: { projectId },
+      });
+    },
+  })
+  .mutation("createApiKey", {
+    input: z.object({
+      name: z.string().optional(),
+      projectId: z.string(),
+    }),
+    async resolve({ input, ctx }) {
+      await ProjectService.hasAccessToProject({
+        ctx,
+        projectId: input.projectId,
+      });
+
+      const apiKey = await ProjectService.generateApiKey(
+        input.projectId,
+        input.name ?? "New Api key"
+      );
+
+      return apiKey;
+    },
   });

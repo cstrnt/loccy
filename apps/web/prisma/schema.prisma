@@ -70,6 +70,7 @@ model Project {
     name     String
     users    ProjectUsers[]
     branches ProjectBranch[]
+    apiKeys  ApiKey[]
 }
 
 model ProjectUsers {
@@ -116,4 +117,15 @@ model Locale {
     content  Json
 
     @@id([name, branchId])
+}
+
+model ApiKey {
+    id        String @id @default(cuid())
+    name      String
+    hashedKey String @unique
+
+    createdAt DateTime @default(now())
+
+    project   Project @relation(fields: [projectId], references: [id])
+    projectId String
 }

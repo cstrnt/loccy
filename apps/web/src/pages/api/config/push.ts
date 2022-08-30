@@ -3,15 +3,17 @@ import { z } from "zod";
 import { ProjectService } from "~/server/services/ProjectService";
 import { prisma } from "../../../server/db/client";
 import { localeFileSchema } from "@loccy/shared";
+import bcrypt from "bcrypt";
 
 const incomingSchema = localeFileSchema.merge(
   z.object({
     branchName: z.string().default(ProjectService.DEFAULT_BRANCH_NAME),
   })
 );
-// TODO: REMOVE projectId
-// .omit({ projectId: true });
 
+const headersSchema = z.object({
+  authorization: z.string(),
+});
 export default async function pushConfigHandler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -20,14 +22,22 @@ export default async function pushConfigHandler(
     res.status(405).end();
     return;
   }
+
   const body = incomingSchema.safeParse(req.body);
+  const headers = headersSchema.safeParse(req.headers);
+
+  if (!headers.success) {
+    res.status(401).end();
+    return;
+  }
 
   if (!body.success) {
     res.status(400).send(body.error);
     return;
   }
 
-  const { locales, defaultLocale, keys, projectId, branchName } = body.data;
+  const { locales, defaultLocale, keys, branchName } = body.data;
+  const { authorization } = headers.data;
 
   if (!locales.includes(defaultLocale)) {
     console.log("default locale not in locales");
@@ -35,17 +45,17 @@ export default async function pushConfigHandler(
     return;
   }
 
-  const currentBranch = await prisma.projectBranch.findUnique({
+  const hashedKey = ProjectService.encryptKey(authorization);
+
+  const currentBranch = await prisma.projectBranch.findFirst({
     where: {
-      name_projectId: {
-        projectId,
-        name: branchName,
-      },
+      project: { apiKeys: { some: { hashedKey } } },
     },
     include: { locales: true, localeKeys: true },
   });
 
   if (!currentBranch) {
+    console.log({ hashedKey, authorization });
     res.status(400).end();
     return;
   }
@@ -71,13 +81,13 @@ export default async function pushConfigHandler(
           name_branchName_branchProjectId: {
             name: key,
             branchName,
-            branchProjectId: projectId,
+            branchProjectId: currentBranch.projectId,
           },
         },
         create: {
           name: key,
           branchName,
-          branchProjectId: projectId,
+          branchProjectId: currentBranch.projectId,
           description,
           params: params ?? {},
         },

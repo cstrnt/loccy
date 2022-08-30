@@ -5,7 +5,7 @@ import en from '../locales/en';
 
 const App = ({ Component, pageProps }: AppProps) => {
   return (
-    <I18nProvider locale={pageProps.locale} fallback={<p>Loading initial locale client-side</p>} fallbackLocale={en}>
+    <I18nProvider locale={pageProps.locale}>
       <Component {...pageProps} />
     </I18nProvider>
   );

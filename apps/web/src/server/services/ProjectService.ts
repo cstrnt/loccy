@@ -1,7 +1,9 @@
 import { ROLE } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { prisma } from "../db/client";
-import { Context } from "../router/context";
+import { type Context } from "../router/context";
+import crypto from "crypto";
+import { env } from "~/utils/env";
 
 export abstract class ProjectService {
   static DEFAULT_BRANCH_NAME = "main";
@@ -19,6 +21,27 @@ export abstract class ProjectService {
       },
     });
   }
+  static encryptKey(key: string) {
+    return crypto
+      .createHmac("sha256", env.ENCRYPTION_SECRET)
+      .update(key)
+      .digest("hex");
+  }
+  static async generateApiKey(projectId: string, name: string) {
+    const key = crypto.randomBytes(32).toString("hex");
+
+    const encrypted = ProjectService.encryptKey(key);
+
+    await prisma.apiKey.create({
+      data: {
+        hashedKey: encrypted,
+        name,
+        project: { connect: { id: projectId } },
+      },
+    });
+    return key;
+  }
+
   static async hasAccessToProject({
     ctx,
     projectId,
@@ -41,5 +64,6 @@ export abstract class ProjectService {
     });
 
     if (!project) throw new TRPCError({ code: "UNAUTHORIZED" });
+    return project;
   }
 }

@@ -1,4 +1,4 @@
-import type { LocaleFile } from "@loccy/shared";
+import { getLoccyRemoteUrl, LocaleFile } from "@loccy/shared";
 export { inferLocales, asConfig } from "@loccy/shared";
 
 export function generateLocales(config: LocaleFile) {
@@ -6,7 +6,7 @@ export function generateLocales(config: LocaleFile) {
     acc[localeKey] = () =>
       fetch(
         // TODO: add branch name to path
-        `http://localhost:3000/api/locales/${config.projectId}/${localeKey}`
+        `${getLoccyRemoteUrl()}/api/locales/${config.projectId}/${localeKey}`
       )
         .then((r) => r.json())
         .then((e) => ({ default: e }));

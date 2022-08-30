@@ -1,7 +1,7 @@
 import { asConfig } from "@loccy/client";
 
 export default asConfig({
-  projectId: "cl77hcrg20357f3mf0fbhzuft",
+  projectId: "cl7cyhkyr002209jtsjcm4nr0",
   locales: ["en", "de", "es"],
   defaultLocale: "en",
   keys: {

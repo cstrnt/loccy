@@ -20,6 +20,11 @@ export type inferLocales<T extends LocaleFile> = {
     : never}}`;
 };
 
-export const asConfig = <T extends LocaleFile>(config: T): T => config;
+export const asConfig = <T extends any>(config: T): T => config;
 
-export const DEFAULT_FILE_NAME = "loccy.config.mjs";
+export const DEFAULT_FILE_NAME = "loccy.config.ts";
+
+export const getLoccyRemoteUrl = () =>
+  process.env.LOCCY_REMOTE_URL ?? process.env.NODE_ENV === "production"
+    ? "https://loccy.vercel.app"
+    : "http://localhost:3000";

@@ -14,7 +14,6 @@
   "author": "Tim Raderschad",
   "license": "ISC",
   "devDependencies": {
-    "@loccy/shared": "workspace:*",
     "@types/node": "18.0.0",
     "tsup": "^6.2.3",
     "typescript": "4.7.4"
