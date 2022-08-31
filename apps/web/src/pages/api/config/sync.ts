@@ -3,11 +3,10 @@ import { z } from "zod";
 import { ProjectService } from "~/server/services/ProjectService";
 import { prisma } from "../../../server/db/client";
 import { localeFileSchema } from "@loccy/shared";
-import bcrypt from "bcrypt";
 
 const incomingSchema = localeFileSchema.merge(
   z.object({
-    branchName: z.string().default(ProjectService.DEFAULT_BRANCH_NAME),
+    branchName: z.string(),
   })
 );
 
@@ -47,18 +46,31 @@ export default async function pushConfigHandler(
 
   const hashedKey = ProjectService.encryptKey(authorization);
 
-  const currentBranch = await prisma.projectBranch.findFirst({
+  const apiKey = await prisma.apiKey.findUnique({
     where: {
-      project: { apiKeys: { some: { hashedKey } } },
+      hashedKey,
     },
-    include: { locales: true, localeKeys: true },
   });
 
-  if (!currentBranch) {
-    console.log({ hashedKey, authorization });
+  if (!apiKey) {
     res.status(400).end();
     return;
   }
+
+  const currentBranch = await prisma.projectBranch.upsert({
+    where: {
+      name_projectId: {
+        name: branchName,
+        projectId: apiKey.projectId,
+      },
+    },
+    create: {
+      name: branchName,
+      projectId: apiKey.projectId,
+    },
+    update: {},
+    include: { locales: true },
+  });
 
   const missingLocales = locales.filter(
     (locale) => !currentBranch.locales.some((l) => l.name === locale)
@@ -74,14 +86,13 @@ export default async function pushConfigHandler(
     )
   );
 
-  // TODO: remove missing keys (aka. deleted ones) ?
-  // prisma.localeKey.deleteMany({
-  //   where: {
-  //     name: { notIn: [] },
-  //     branchName,
-  //     branchProjectId: currentBranch.projectId,
-  //   },
-  // });
+  await prisma.localeKey.deleteMany({
+    where: {
+      name: { notIn: Object.keys(keys) },
+      branchName,
+      branchProjectId: currentBranch.projectId,
+    },
+  });
 
   await Promise.all(
     Object.entries(keys).map(([key, { description, params }]) =>

@@ -25,6 +25,7 @@
     "@trpc/react": "^9.27.1",
     "@trpc/server": "^9.27.1",
     "bcrypt": "^5.0.1",
+    "dayjs": "^1.11.5",
     "envsafe": "^2.0.3",
     "focus-visible": "^5.2.0",
     "framer-motion": "^7.2.1",

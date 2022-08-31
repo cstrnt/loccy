@@ -9,7 +9,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { PropsWithChildren } from "react";
-import { BiBuoy, BiCog, BiHome, BiKey } from "react-icons/bi";
+import { BiBook, BiBuoy, BiCog, BiHome, BiKey } from "react-icons/bi";
 import { useI18n } from "~/utils/locales";
 import { AccountSwitcher } from "../components/AppLayout/AccountSwitcher";
 import { NavItem } from "../components/AppLayout/NavItem";
@@ -48,7 +48,15 @@ export const AppLayout = ({ children }: PropsWithChildren) => {
                     label={t("secrets")}
                   />
                 </Link>
+                <Link href={useGetUrl("settings")} passHref>
+                  <NavItem
+                    icon={<BiCog />}
+                    active={router.asPath.includes("/settings")}
+                    label={t("settings")}
+                  />
+                </Link>
               </Stack>
+
               {/* <NavGroup label="Your Business">
                 <NavItem icon={<BiCreditCard />} label="Transactions" />
                 <NavItem icon={<BiUserCircle />} label="Customers" />
@@ -65,12 +73,11 @@ export const AppLayout = ({ children }: PropsWithChildren) => {
             </Stack>
             <Box>
               <Stack spacing="1">
-                <Link href={useGetUrl("settings")} passHref>
+                <Link href="/docs">
                   <NavItem
                     subtle
-                    icon={<BiCog />}
-                    active={router.asPath.includes("/secrets")}
-                    label={t("settings")}
+                    icon={<BiBook />}
+                    label={t("documentation")}
                   />
                 </Link>
                 <Link href="/help">
@@ -85,10 +92,8 @@ export const AppLayout = ({ children }: PropsWithChildren) => {
             </Box>
           </Flex>
         </Box>
-        <Box bg={mode("white", "gray.800")} flex="1" p="6">
-          <Box w="full" h="full" rounded="lg" overflowY="auto" p={6}>
-            {children}
-          </Box>
+        <Box bg={mode("white", "gray.800")} flex="1" p="6" overflowY="auto">
+          {children}
         </Box>
       </Flex>
     </Box>

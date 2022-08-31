@@ -18,6 +18,8 @@ import {
   useMenuButton,
 } from "@chakra-ui/react";
 import { inferProcedureOutput } from "@trpc/server";
+import { signOut } from "next-auth/react";
+import { useRouter } from "next/router";
 import { BiGitBranch } from "react-icons/bi";
 import { HiSelector } from "react-icons/hi";
 import { AppRouter } from "../../server/router";
@@ -33,8 +35,10 @@ export const AccountSwitcherButton = ({
   data,
   ...props
 }: FlexProps & ButtonProps) => {
+  const router = useRouter();
   const buttonProps = useMenuButton(props);
   const currentProject = data?.projects[0]?.project;
+
   return (
     <Flex
       as="button"
@@ -59,7 +63,6 @@ export const AccountSwitcherButton = ({
           w="8"
           h="8"
           rounded="md"
-          objectFit="cover"
           src={data?.image ?? undefined}
           name={data?.name ?? "U"}
         />
@@ -69,7 +72,7 @@ export const AccountSwitcherButton = ({
           </Box>
           <Flex alignItems="center" fontSize="xs" color="gray.400">
             <Icon as={BiGitBranch} mr={1} />
-            {currentProject?.branches[0]?.name}
+            {router.query.branch}
           </Flex>
         </Box>
       </HStack>
@@ -80,9 +83,17 @@ export const AccountSwitcherButton = ({
   );
 };
 
+function changeBranch(newBranchName: string) {
+  const url = new URL(window.location.href);
+  url.searchParams.set("branch", newBranchName);
+  return url;
+}
+
 export const AccountSwitcher = () => {
+  const router = useRouter();
   const { data, isLoading } = trpc.useQuery(["user.me"]);
   const currentProject = data?.projects[0]?.project;
+  const currentBranch = router.query.branch as string;
   return (
     <Skeleton isLoaded={!isLoading}>
       <Menu>
@@ -96,7 +107,12 @@ export const AccountSwitcher = () => {
           <Text fontWeight="medium" mb="2">
             {data?.email}
           </Text>
-          <MenuOptionGroup defaultValue={currentProject?.branches[0]?.name}>
+          <MenuOptionGroup
+            value={currentBranch}
+            onChange={(branchName) =>
+              router.push(changeBranch(branchName as string))
+            }
+          >
             {currentProject?.branches.map((branch) => (
               <MenuItemOption
                 key={branch.name}
@@ -105,17 +121,26 @@ export const AccountSwitcher = () => {
                 rounded="md"
               >
                 <Flex alignItems="center">
-                  <Icon as={BiGitBranch} mr={1}/> {branch.name} {branch.isDefault ? "(default)" : ""}
+                  <Icon as={BiGitBranch} mr={1} /> {branch.name}{" "}
+                  {branch.isDefault ? "(default)" : ""}
                 </Flex>
               </MenuItemOption>
             ))}
           </MenuOptionGroup>
           <MenuDivider />
-          <MenuItem rounded="md">Create Branch</MenuItem>
+          {/* <MenuItem rounded="md">Create Branch</MenuItem>
           <MenuItem rounded="md">Workspace settings</MenuItem>
-          <MenuItem rounded="md">Add an account</MenuItem>
+          <MenuItem rounded="md">Add an account</MenuItem> */}
           <MenuDivider />
-          <MenuItem rounded="md">Logout</MenuItem>
+          <MenuItem
+            rounded="md"
+            onClick={async () => {
+              await signOut();
+              router.replace("/");
+            }}
+          >
+            Logout
+          </MenuItem>
         </MenuList>
       </Menu>
     </Skeleton>

@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Flex,
   FormControl,
@@ -9,6 +10,7 @@ import {
   Input,
   Select,
   Stack,
+  Text,
   useToast,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
@@ -19,6 +21,7 @@ import { trpc } from "../../../utils/trpc";
 import { useForm } from "react-hook-form";
 import { LocaleKey } from "@prisma/client";
 import { getLocaleProps, useI18n } from "~/utils/locales";
+import { redirectGSSP } from "~/utils/redirect";
 
 export default function TranslationsPage() {
   const toast = useToast();
@@ -131,27 +134,32 @@ export default function TranslationsPage() {
   };
 
   return (
-    <>
-      <Heading size="md" mb={6}>
-        {t("translations")}
-      </Heading>
-      <Select
-        value={currentLocaleName}
-        onChange={(e) =>
-          router.push({
-            ...router,
-            query: { ...router.query, locale: e.target.value },
-          })
-        }
-      >
-        {data?.locales.map((locale) => (
-          <option key={locale.name} value={locale.name}>
-            {locale.name}
-          </option>
-        ))}
-      </Select>
+    <Box height="100%">
+      <Flex alignItems="center" justifyContent="space-between" mb={4}>
+        <Box mb={6}>
+          <Heading size="md">{t("translations")}</Heading>
+        </Box>
+        <FormControl maxW={150}>
+          <FormLabel>{t("selectLocale")}</FormLabel>
+          <Select
+            value={currentLocaleName}
+            onChange={(e) =>
+              router.push({
+                ...router,
+                query: { ...router.query, locale: e.target.value },
+              })
+            }
+          >
+            {data?.locales.map((locale) => (
+              <option key={locale.name} value={locale.name}>
+                {locale.name}
+              </option>
+            ))}
+          </Select>
+        </FormControl>
+      </Flex>
 
-      <Stack spacing={8}>
+      <Stack spacing={8} overflowY="auto" height="calc(100% - 6rem)" px={2}>
         {Array.from(data?.localeKeys ?? [])
           .sort((a, b) => a.name.localeCompare(b.name))
           .map(({ name, description, params }) => (
@@ -180,7 +188,7 @@ export default function TranslationsPage() {
             </FormControl>
           ))}
       </Stack>
-    </>
+    </Box>
   );
 }
 
@@ -188,4 +196,4 @@ TranslationsPage.getLayout = (page: ReactElement) => (
   <AppLayout>{page}</AppLayout>
 );
 
-export const getServerSideProps = getLocaleProps();
+export const getServerSideProps = getLocaleProps(redirectGSSP);

@@ -1,9 +1,12 @@
 import {
+  Box,
+  Center,
   Flex,
   Heading,
   IconButton,
   Stack,
   StackDivider,
+  Text,
   useToast,
   VStack,
 } from "@chakra-ui/react";
@@ -13,6 +16,9 @@ import { BiPlus, BiTrash } from "react-icons/bi";
 import { getLocaleProps, useI18n } from "~/utils/locales";
 import { AppLayout } from "../../../layouts/AppLayout";
 import { trpc } from "../../../utils/trpc";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+dayjs.extend(relativeTime);
 
 export default function SecretsPage() {
   const context = trpc.useContext();
@@ -75,20 +81,39 @@ export default function SecretsPage() {
             onClick={createApiKey}
           />
         </Flex>
-        <VStack divider={<StackDivider borderColor="gray.200" />}>
-          {data?.map((apiKey) => (
-            <Flex key={apiKey.id}>
-              {apiKey.name} | {apiKey.hashedKey}{" "}
-              <IconButton
-                aria-label={t("revokeApikey")}
-                title={t("revokeApikey")}
-                icon={<BiTrash />}
-                colorScheme="red"
-                onClick={() => revokeApikey(apiKey.id)}
-              />
-            </Flex>
-          ))}
-        </VStack>
+
+        <Box bg="gray.50" py="4">
+          <Stack divider={<StackDivider />} spacing="4">
+            {data?.map((apiKey) => (
+              <Stack
+                key={apiKey.id}
+                direction="row"
+                fontSize="sm"
+                px="4"
+                spacing="0.5"
+                justifyContent="space-between"
+                rounded="xl"
+              >
+                <Box>
+                  <Text fontWeight="medium" color="emphasized">
+                    {apiKey.name}
+                  </Text>
+                  <Text color="subtle">
+                    Created: {dayjs(apiKey.createdAt).fromNow()}
+                  </Text>
+                </Box>
+                <IconButton
+                  size="sm"
+                  alignSelf="center"
+                  icon={<BiTrash />}
+                  colorScheme="red"
+                  aria-label={t("revokeApikey")}
+                  onClick={() => revokeApikey(apiKey.id)}
+                />
+              </Stack>
+            ))}
+          </Stack>
+        </Box>
       </Stack>
     </>
   );

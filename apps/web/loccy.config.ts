@@ -15,11 +15,13 @@ export default asConfig({
     settings: {},
     home: {},
     help: {},
+    documentation: {},
     saved: {
       description: "Message that is shown when a locale is saved",
     },
     apiKeyRevokeSuccess: {},
     localeSaveError: {},
+    selectLocale: {},
     createApiKey: {
       description: "CTA used to create a new api key",
     },

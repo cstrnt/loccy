@@ -1,21 +1,16 @@
 #!/usr/bin/env node
-import chalk from "chalk";
-import clear from "clear";
-import figlet from "figlet";
-import { program } from "commander";
-import path from "path";
-import fs from "fs/promises";
-import { fetch } from "undici";
 import {
   DEFAULT_FILE_NAME,
-  localeFileSchema,
   getLoccyRemoteUrl,
+  localeFileSchema,
 } from "@loccy/shared";
-import { transformFile } from "@swc/core";
+import chalk from "chalk";
+import { program } from "commander";
 import { build } from "esbuild";
-
-clear();
-console.log(chalk.red(figlet.textSync("loccy", { horizontalLayout: "full" })));
+import fs from "fs/promises";
+import path from "path";
+import { fetch } from "undici";
+import { getBranch } from "./helpers";
 
 program.name("loccy").description("The offical loccy cli").version("0.0.1");
 
@@ -54,20 +49,26 @@ program
       const data = require(tempFilePath).default;
 
       const config = await localeFileSchema.parseAsync(data);
-      const { status } = await fetch(`${getLoccyRemoteUrl()}/api/config/push`, {
+      const branchName = await getBranch();
+
+      // TODO: add overview of changed data -> Added, updated, deleted keys and values
+
+      await fetch(`${getLoccyRemoteUrl()}/api/config/sync`, {
         method: "POST",
-        body: JSON.stringify(config),
+        body: JSON.stringify({ ...config, branchName }),
         headers: {
           "Content-Type": "application/json",
           Authorization: options.token,
         },
       });
-      console.log(status);
+      console.log(chalk.green("Sync Complete"));
     } catch (e) {
-      console.error(e);
       console.log(chalk.red("Invalid Config File"));
     } finally {
-      await fs.unlink(tempFilePath);
+      try {
+        await fs.stat(tempFilePath);
+        await fs.unlink(tempFilePath);
+      } catch (e) {}
     }
   });
 
