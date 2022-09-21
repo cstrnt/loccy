@@ -31,7 +31,7 @@
     "framer-motion": "^7.2.1",
     "ioredis": "^5.2.3",
     "jsum": "2.0.0-alpha.4",
-    "next": "12.2.0",
+    "next": "12.3.1",
     "next-auth": "^4.10.3",
     "next-international": "*",
     "nextjs-cors": "^2.1.1",
