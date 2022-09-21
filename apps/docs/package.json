@@ -1,0 +1,21 @@
+{
+  "name": "docs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "start": "next start",
+    "build": "next build"
+  },
+  "keywords": [],
+  "author": "Tim Raderschad",
+  "license": "ISC",
+  "dependencies": {
+    "next": "^12.3.1",
+    "nextra": "^1.1.0",
+    "nextra-theme-docs": "^1.2.6",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  }
+}
