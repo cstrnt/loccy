@@ -62,7 +62,6 @@ export const AccountSwitcherButton = ({
         <Avatar
           w="8"
           h="8"
-          rounded="md"
           src={data?.image ?? undefined}
           name={data?.name ?? "U"}
         />

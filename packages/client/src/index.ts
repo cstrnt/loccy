@@ -6,7 +6,9 @@ export function generateLocales(config: LocaleFile) {
     acc[localeKey] = () =>
       fetch(
         // TODO: add branch name to path
-        `${getLoccyRemoteUrl()}/api/locales/${config.projectId}/${localeKey}`
+        `${getLoccyRemoteUrl()}/api/locales/${config.projectId}/${localeKey}${
+          process.env.NODE_ENV === "development" ? "?noCache=true" : ""
+        }`
       )
         .then((r) => r.json())
         .then((e) => ({ default: e }))

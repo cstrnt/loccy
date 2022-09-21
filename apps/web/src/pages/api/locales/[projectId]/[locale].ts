@@ -61,6 +61,13 @@ export default async function handler(
       return;
     }
 
+    if (!req.query.noCache) {
+      res.setHeader(
+        "Cache-Control",
+        `s-maxage=1, stale-while-revalidate=${60 * 5}`
+      );
+    }
+
     if (type === "module") {
       res.setHeader("Content-Type", "application/javascript");
       res.send(`export default ${JSON.stringify(persistedLocale.content)}`);
