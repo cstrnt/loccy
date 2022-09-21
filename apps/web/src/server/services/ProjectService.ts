@@ -4,6 +4,8 @@ import { prisma } from "../db/client";
 import { type Context } from "../router/context";
 import crypto from "crypto";
 import { env } from "~/utils/env";
+import { LocaleFile } from "@loccy/shared";
+import jsum from "jsum";
 
 export abstract class ProjectService {
   static DEFAULT_BRANCH_NAME = "main";
@@ -65,5 +67,9 @@ export abstract class ProjectService {
 
     if (!project) throw new TRPCError({ code: "UNAUTHORIZED" });
     return project;
+  }
+
+  static getConfigHash(config: LocaleFile) {
+    return jsum.digest(config, "SHA1", "HEX");
   }
 }

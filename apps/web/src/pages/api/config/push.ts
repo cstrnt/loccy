@@ -3,16 +3,18 @@ import { z } from "zod";
 import { ProjectService } from "~/server/services/ProjectService";
 import { prisma } from "../../../server/db/client";
 import { localeFileSchema } from "@loccy/shared";
+import { configCacheService } from "~/server/services/ConfigCacheService";
 
-const incomingSchema = localeFileSchema.merge(
+export const incomingConfigSchema = localeFileSchema.merge(
   z.object({
     branchName: z.string(),
   })
 );
 
-const headersSchema = z.object({
+export const authHeadersSchema = z.object({
   authorization: z.string(),
 });
+
 export default async function pushConfigHandler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -22,8 +24,8 @@ export default async function pushConfigHandler(
     return;
   }
 
-  const body = incomingSchema.safeParse(req.body);
-  const headers = headersSchema.safeParse(req.headers);
+  const body = incomingConfigSchema.safeParse(req.body);
+  const headers = authHeadersSchema.safeParse(req.headers);
 
   if (!headers.success) {
     res.status(401).end();
@@ -54,6 +56,19 @@ export default async function pushConfigHandler(
 
   if (!apiKey) {
     res.status(400).end();
+    return;
+  }
+
+  const configHash = ProjectService.getConfigHash(body.data);
+
+  const savedHash = await configCacheService.getFileHash(
+    apiKey.projectId,
+    branchName
+  );
+
+  // we are done here, nothing changed
+  if (savedHash === configHash) {
+    res.status(200).end();
     return;
   }
 
@@ -95,7 +110,7 @@ export default async function pushConfigHandler(
   });
 
   await Promise.all(
-    Object.entries(keys).map(([key, { description, params }]) =>
+    Object.entries(keys).map(([key, { description, params }], index) =>
       prisma.localeKey.upsert({
         where: {
           name_branchName_branchProjectId: {
@@ -110,13 +125,22 @@ export default async function pushConfigHandler(
           branchProjectId: currentBranch.projectId,
           description,
           params: params ?? {},
+          index,
         },
         update: {
           description,
-          params,
+          params: params ?? {},
+          index,
         },
       })
     )
   );
+
+  await configCacheService.setFileHash(
+    apiKey.projectId,
+    branchName,
+    ProjectService.getConfigHash(body.data)
+  );
+
   res.status(200).end();
 }

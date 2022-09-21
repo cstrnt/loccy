@@ -29,6 +29,8 @@
     "envsafe": "^2.0.3",
     "focus-visible": "^5.2.0",
     "framer-motion": "^7.2.1",
+    "ioredis": "^5.2.3",
+    "jsum": "2.0.0-alpha.4",
     "next": "12.2.0",
     "next-auth": "^4.10.3",
     "next-international": "*",
@@ -43,6 +45,7 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
+    "@types/jsum": "^0.1.0",
     "@types/node": "18.0.0",
     "@types/react": "18.0.14",
     "@types/react-dom": "18.0.5",

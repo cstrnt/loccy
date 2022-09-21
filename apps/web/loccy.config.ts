@@ -1,4 +1,5 @@
 import { asConfig } from "@loccy/client";
+import { ApiKeyAlert } from "~/components/ApiKeyAlert.jsx";
 import nextConfig from "./next.config.js";
 
 export default asConfig({
@@ -15,6 +16,7 @@ export default asConfig({
     settings: {},
     home: {},
     help: {},
+    close: {},
     documentation: {},
     saved: {
       description: "Message that is shown when a locale is saved",
@@ -25,6 +27,8 @@ export default asConfig({
     createApiKey: {
       description: "CTA used to create a new api key",
     },
+    "apiKeyAlert.copied": {},
+    "ApiKeyAlert.body": {},
     revokeApikey: {
       description: "CTA used to revoke an api key",
     },

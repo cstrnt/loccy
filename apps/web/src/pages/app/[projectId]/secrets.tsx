@@ -7,20 +7,23 @@ import {
   Stack,
   StackDivider,
   Text,
+  useDisclosure,
   useToast,
   VStack,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { ReactElement } from "react";
+import { ReactElement, useState } from "react";
 import { BiPlus, BiTrash } from "react-icons/bi";
 import { getLocaleProps, useI18n } from "~/utils/locales";
 import { AppLayout } from "../../../layouts/AppLayout";
 import { trpc } from "../../../utils/trpc";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { ApiKeyAlert } from "~/components/ApiKeyAlert";
 dayjs.extend(relativeTime);
 
 export default function SecretsPage() {
+  const [apiKey, setApiKey] = useState<string | null>(null);
   const context = trpc.useContext();
   const { t } = useI18n();
   const toast = useToast();
@@ -50,7 +53,7 @@ export default function SecretsPage() {
         },
       }
     );
-    console.log(key);
+    setApiKey(key);
   };
 
   const revokeApikey = async (id: string) => {
@@ -83,6 +86,11 @@ export default function SecretsPage() {
         </Flex>
 
         <Box bg="gray.50" py="4">
+          <ApiKeyAlert
+            isOpen={apiKey != null}
+            onClose={() => setApiKey(null)}
+            apiKey={apiKey!}
+          />
           <Stack divider={<StackDivider />} spacing="4">
             {data?.map((apiKey) => (
               <Stack

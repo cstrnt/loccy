@@ -79,6 +79,7 @@ export const projectRouter = createRouter()
       });
       return ctx.prisma.apiKey.findMany({
         where: { projectId },
+        orderBy: { createdAt: "desc" },
       });
     },
   })

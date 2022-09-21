@@ -14,6 +14,8 @@
   "license": "ISC",
   "devDependencies": {
     "@loccy/shared": "workspace:*",
+    "@types/inquirer": "^9.0.1",
+    "@types/jsum": "^0.1.0",
     "@types/node": "18.0.0",
     "tsup": "^6.2.3",
     "typescript": "4.7.4"
@@ -23,7 +25,10 @@
     "@swc/register": "^0.1.10",
     "chalk": "4.1.2",
     "commander": "^9.4.0",
+    "deepmerge-ts": "^4.2.2",
     "esbuild": "^0.15.6",
+    "inquirer": "^9.1.1",
+    "jsum": "2.0.0-alpha.4",
     "undici": "^5.10.0"
   }
 }

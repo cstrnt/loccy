@@ -161,7 +161,7 @@ export default function TranslationsPage() {
 
       <Stack spacing={8} overflowY="auto" height="calc(100% - 6rem)" px={2}>
         {Array.from(data?.localeKeys ?? [])
-          .sort((a, b) => a.name.localeCompare(b.name))
+          .sort((a, b) => a.index - b.index)
           .map(({ name, description, params }) => (
             <FormControl
               key={`${name}-${currentLocaleName}`}

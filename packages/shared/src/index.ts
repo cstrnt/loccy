@@ -20,7 +20,7 @@ export type inferLocales<T extends LocaleFile> = {
     : never}}`;
 };
 
-export const asConfig = <T extends any>(config: T): T => config;
+export const asConfig = <T extends LocaleFile>(config: T): T => config;
 
 export const DEFAULT_FILE_NAME = "loccy.config.ts";
 
