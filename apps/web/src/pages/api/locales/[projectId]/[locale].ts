@@ -62,10 +62,7 @@ export default async function handler(
     }
 
     if (!req.query.noCache) {
-      res.setHeader(
-        "Cache-Control",
-        `s-maxage=1, stale-while-revalidate=${60 * 5}`
-      );
+      res.setHeader("Cache-Control", `stale-while-revalidate=300`);
     }
 
     if (type === "module") {
