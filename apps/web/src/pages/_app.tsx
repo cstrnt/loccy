@@ -16,6 +16,7 @@ export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
 
 type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
+  pageProps: any;
 };
 
 const MyApp = ({
