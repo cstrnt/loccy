@@ -51,9 +51,7 @@ export function ApiKeyAlert({ isOpen, onClose, apiKey }: Props) {
         <AlertDialogHeader>New Api Key</AlertDialogHeader>
         <AlertDialogCloseButton />
         <AlertDialogBody>
-          {/* TODO: use translation */}
-          Make sure to copy your personal access token now. You won’t be able to
-          see it again!
+          {t("apiKeyAlert.body")}
           <InputGroup>
             <Input readOnly disabled pr="4.5rem" defaultValue={apiKey} />
             <InputRightElement width="4.5rem">
