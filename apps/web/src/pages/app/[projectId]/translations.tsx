@@ -123,7 +123,6 @@ export default function TranslationsPage() {
         status: "success",
         title: t("saved"),
       });
-      refetch();
     } catch (e) {
       toast({
         position: "bottom-right",
