@@ -1,22 +1,17 @@
-import type { NextPage } from "next";
-import { signIn } from "next-auth/react";
-import Head from "next/head";
-import { trpc } from "../utils/trpc";
+import { Flex } from "@chakra-ui/react";
+import { LandingHero } from "~/components/LandingHero";
+import { LandingLayout } from "~/layouts/LandingLayout";
 
-const Home: NextPage = () => {
+const Home = () => {
   return (
-    <>
-      <button
-        onClick={() =>
-          signIn("google", {
-            callbackUrl: "/app",
-          })
-        }
-      >
-        Sign In
-      </button>
-    </>
+    <Flex>
+      <LandingHero />
+    </Flex>
   );
 };
+
+Home.getLayout = (page: React.ReactNode) => (
+  <LandingLayout>{page}</LandingLayout>
+);
 
 export default Home;
