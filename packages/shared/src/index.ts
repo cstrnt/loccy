@@ -25,4 +25,4 @@ export const asConfig = <T extends LocaleFile>(config: T): T => config;
 export const DEFAULT_FILE_NAME = "loccy.config.ts";
 
 export const getLoccyRemoteUrl = () =>
-  process.env.LOCCY_REMOTE_URL ?? "https://loccy.app";
+  process.env.LOCCY_REMOTE_URL ?? "https://www.loccy.app";
