@@ -5,6 +5,14 @@ const nextConfig = {
     locales: ["de", "en"],
     defaultLocale: "en",
   },
+  async rewrites() {
+    return [
+      {
+        source: "/docs/:path*",
+        destination: `https://docs.loccy.app/docs/:path*`,
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;
