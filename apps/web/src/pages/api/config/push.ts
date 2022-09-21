@@ -95,7 +95,12 @@ export default async function pushConfigHandler(
     missingLocales.map((locale) =>
       prisma.locale.upsert({
         where: { name_branchId: { branchId: currentBranch.id, name: locale } },
-        create: { name: locale, branchId: currentBranch.id, content: {} },
+        create: {
+          name: locale,
+          branchId: currentBranch.id,
+          content: {},
+          isDefault: locale === defaultLocale,
+        },
         update: {},
       })
     )
