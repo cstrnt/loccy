@@ -29,7 +29,7 @@ export default function TranslationsPage() {
     mode: "onChange",
   });
 
-  const { data, refetch } = trpc.getProjectBranch.useQuery({
+  const { data } = trpc.getProjectBranch.useQuery({
     id: router.query.projectId as string,
     branchName: router.query.branch as string,
   });

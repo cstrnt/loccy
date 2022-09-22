@@ -18,8 +18,8 @@ const useGetUrl = (newPath: string) => {
   const router = useRouter();
   const projectId = router.query.projectId;
   if (!projectId || typeof projectId !== "string") return "/";
-  const searchParams = new URLSearchParams(router.asPath.split("?")[1]);
-  return `/app/${projectId}/${newPath}?${searchParams.toString()}`;
+
+  return `/app/${projectId}/${newPath}`;
 };
 
 export const AppLayout = ({ children }: PropsWithChildren) => {

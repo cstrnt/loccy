@@ -35,7 +35,9 @@ export const AccountSwitcherButton = ({
 }: FlexProps & ButtonProps) => {
   const router = useRouter();
   const buttonProps = useMenuButton(props);
-  const currentProject = data?.projects[0]?.project;
+  const currentProject = data?.projects?.find(
+    (p) => p.projectId === router.query.projectId
+  )?.project;
 
   return (
     <Flex
@@ -69,7 +71,8 @@ export const AccountSwitcherButton = ({
           </Box>
           <Flex alignItems="center" fontSize="xs" color="gray.400">
             <Icon as={BiGitBranch} mr={1} />
-            {router.query.branch}
+            {router.query.branch ??
+              currentProject?.branches.find((b) => b.isDefault)?.name}
           </Flex>
         </Box>
       </HStack>
@@ -93,6 +96,7 @@ export const AccountSwitcher = () => {
   });
   const currentProject = data?.projects[0]?.project;
   const currentBranch = router.query.branch as string;
+
   return (
     <Skeleton isLoaded={!isLoading}>
       <Menu>
