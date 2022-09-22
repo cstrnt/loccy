@@ -1,13 +1,18 @@
 import { asConfig } from "@loccy/client";
-import nextConfig from "./next.config.js";
 
 export default asConfig({
-  defaultLocale: nextConfig.i18n?.defaultLocale!,
-  locales: nextConfig.i18n?.locales!,
-  projectId: "cl77hcrg20357f3mf0fbhzuft",
+  defaultLocale: "en",
+  locales: ["en", "de"],
+  projectId: "cl8dbovcm0029yumfny944pgb",
   keys: {
+    name: {
+      description: "jeff",
+      params: {
+        name: "?",
+      },
+    },
     justMyBranch: {
-      description: "Translations Heading",
+      description: "Translations Heading :-)",
     },
   },
 });

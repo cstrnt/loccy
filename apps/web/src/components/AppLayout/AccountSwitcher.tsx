@@ -57,22 +57,25 @@ export const AccountSwitcherButton = ({
       transition="all 0.2s"
       _active={{ bg: "gray.600" }}
       _focus={{ shadow: "outline" }}
+      overflow="hidden"
     >
-      <HStack flex="1" spacing="3">
+      <HStack flex="1" spacing="3" overflow="hidden">
         <Avatar
           w="8"
           h="8"
           src={data?.image ?? undefined}
           name={data?.name ?? "U"}
         />
-        <Box textAlign="start">
+        <Box textAlign="start" overflow="hidden">
           <Box noOfLines={1} fontWeight="semibold">
             {currentProject?.name}
           </Box>
           <Flex alignItems="center" fontSize="xs" color="gray.400">
             <Icon as={BiGitBranch} mr={1} />
-            {router.query.branch ??
-              currentProject?.branches.find((b) => b.isDefault)?.name}
+            <Text whiteSpace="nowrap" textOverflow="ellipsis">
+              {router.query.branch ??
+                currentProject?.branches.find((b) => b.isDefault)?.name}{" "}
+            </Text>
           </Flex>
         </Box>
       </HStack>

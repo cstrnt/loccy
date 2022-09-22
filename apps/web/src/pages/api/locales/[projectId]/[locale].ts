@@ -1,4 +1,4 @@
-import { Locale } from "@prisma/client";
+import { Locale, Translation } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 import NextCors from "nextjs-cors";
 import { z } from "zod";
@@ -27,36 +27,29 @@ export default async function handler(
     const params = paramsSchema.parse(req.query);
     const { projectId, locale, branchName, type } = params;
 
+    // TODO: CACHE whole JSON file, invalidate on Change?
     // TODO: CACHE IF BRANCH EXISTS?
-    let persistedLocale: Locale | null = null;
+    let translations: Translation[] | null = null;
 
-    persistedLocale = await prisma.locale.findFirst({
+    translations = await prisma.translation.findMany({
       where: {
-        branch: {
-          name: branchName,
-          projectId: projectId,
-        },
-        name: locale,
+        branchName: branchName,
+        localeName: locale,
+        projectId: projectId,
       },
     });
 
-    if (!persistedLocale) {
-      persistedLocale = await prisma.locale.findFirst({
+    if (!translations || translations.length === 0) {
+      translations = await prisma.translation.findMany({
         where: {
-          branch: {
-            name:
-              // no given branch name or no locale found for given branch
-              !branchName || !persistedLocale
-                ? ProjectService.DEFAULT_BRANCH_NAME
-                : branchName,
-            projectId: projectId,
-          },
-          name: locale,
+          branchName: ProjectService.DEFAULT_BRANCH_NAME,
+          localeName: locale,
+          projectId: projectId,
         },
       });
     }
 
-    if (!persistedLocale) {
+    if (!translations) {
       res.status(404).json({ error: "Locale not found" });
       return;
     }
@@ -65,14 +58,19 @@ export default async function handler(
       res.setHeader("Cache-Control", `s-maxage=60, stale-while-revalidate`);
     }
 
+    const content = translations.reduce((acc, translation) => {
+      acc[translation.key] = translation.value;
+      return acc;
+    }, {} as Record<string, string>);
+
     if (type === "module") {
       res.setHeader("Content-Type", "application/javascript");
-      res.send(`export default ${JSON.stringify(persistedLocale.content)}`);
+      res.send(`export default ${JSON.stringify(content)}`);
       return;
     }
 
     if (type === "json") {
-      res.status(200).json(persistedLocale.content);
+      res.status(200).json(content);
       return;
     }
   } catch (e) {

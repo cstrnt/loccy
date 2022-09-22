@@ -12,7 +12,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { ReactElement, useCallback, useEffect } from "react";
+import { ReactElement, useCallback, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { LocaleService } from "~/server/services/LocaleService";
 import { getLocaleProps, useI18n } from "~/utils/locales";
@@ -71,34 +71,35 @@ export default function TranslationsPage() {
       (locale) => locale.name == (router.query.locale as string)
     )?.name ?? data?.locales?.find((locale) => locale.isDefault)?.name;
 
-  const currentLocale = data?.locales.find(
-    (locale) => locale.name === currentLocaleName
+  const currentTranslations = useMemo(
+    () =>
+      data?.translations.filter((tr) => tr.localeName === currentLocaleName) ??
+      [],
+    [currentLocaleName, data?.translations]
   );
 
   useEffect(() => {
     reset();
     data?.localeKeys.forEach((key) => {
-      const value = (currentLocale?.content as any)?.[key.name] ?? "";
+      const value = currentTranslations.find(
+        (tr) => tr.key === key.name
+      )?.value;
+
       if (!value) {
         setError(LocaleService.cleanLocaleKeyName(key.name), {
           type: "required",
         });
+        return;
       }
       if (!validateKey(value, key.name)) return;
 
       setValue(LocaleService.cleanLocaleKeyName(key.name), value);
     });
-  }, [
-    currentLocale?.content,
-    data?.localeKeys,
-    reset,
-    setError,
-    setValue,
-    validateKey,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentLocaleName]);
 
   const updateKey = async (newValue: string, key: string) => {
-    if (!currentLocaleName || !currentLocale?.content) {
+    if (!currentLocaleName || !currentTranslations) {
       return;
     }
 

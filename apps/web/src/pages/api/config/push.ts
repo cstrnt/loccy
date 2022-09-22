@@ -68,6 +68,7 @@ export default async function pushConfigHandler(
 
   // we are done here, nothing changed
   if (savedHash === configHash) {
+    console.log("Config is the same, nothing to do");
     res.status(200).end();
     return;
   }
@@ -98,7 +99,6 @@ export default async function pushConfigHandler(
         create: {
           name: locale,
           branchId: currentBranch.id,
-          content: {},
           isDefault: locale === defaultLocale,
         },
         update: {},

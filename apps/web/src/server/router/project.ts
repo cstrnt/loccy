@@ -1,8 +1,6 @@
-import { createRouter } from "./context";
-import { z } from "zod";
 import { TRPCError } from "@trpc/server";
+import { z } from "zod";
 import { ProjectService } from "../services/ProjectService";
-import { LocaleService } from "../services/LocaleService";
 import { t } from "../trpc";
 
 export const projectRouter = t.router({
@@ -18,9 +16,12 @@ export const projectRouter = t.router({
       const project = await ctx.prisma.project.findUnique({
         where: { id: input.id },
         include: {
-          branches: { include: { locales: true, localeKeys: true } },
+          branches: {
+            include: { locales: true, localeKeys: true, translations: true },
+          },
         },
       });
+
       if (!project) throw new TRPCError({ code: "NOT_FOUND" });
 
       if (!input.branchName) {
@@ -54,22 +55,33 @@ export const projectRouter = t.router({
             project: { id: input.projectId },
             name: input.branchName,
           },
+
           name: input.locale,
         },
       });
-      if (!locale || !LocaleService.isValidJSON(locale.content)) {
-        throw new TRPCError({ code: "BAD_REQUEST" });
+
+      if (!locale) {
+        throw new TRPCError({ code: "NOT_FOUND" });
       }
 
-      await ctx.prisma.locale.update({
+      await ctx.prisma.translation.upsert({
         where: {
-          name_branchId: { name: locale.name, branchId: locale.branchId },
-        },
-        data: {
-          content: {
-            ...locale.content,
-            [input.key]: input.newValue,
+          key_localeName_branchId: {
+            key: input.key,
+            localeName: input.locale,
+            branchId: locale.branchId,
           },
+        },
+        update: {
+          value: input.newValue,
+        },
+        create: {
+          key: input.key,
+          localeName: input.locale,
+          branchId: locale.branchId,
+          value: input.newValue,
+          branchName: input.branchName,
+          projectId: input.projectId,
         },
       });
     }),

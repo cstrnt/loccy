@@ -84,13 +84,14 @@ model ProjectUsers {
 }
 
 model ProjectBranch {
-    id         String      @unique @default(cuid())
-    name       String
-    project    Project     @relation(fields: [projectId], references: [id])
-    projectId  String
-    isDefault  Boolean     @default(false)
-    locales    Locale[]
-    localeKeys LocaleKey[]
+    id           String        @unique @default(cuid())
+    name         String
+    project      Project       @relation(fields: [projectId], references: [id])
+    projectId    String
+    isDefault    Boolean       @default(false)
+    locales      Locale[]
+    localeKeys   LocaleKey[]
+    translations Translation[]
 
     @@id([name, projectId])
 }
@@ -113,11 +114,29 @@ model Locale {
     isDefault Boolean  @default(false)
     updatedAt DateTime @updatedAt
 
-    branch   ProjectBranch @relation(fields: [branchId], references: [id])
-    branchId String
-    content  Json
+    branch       ProjectBranch @relation(fields: [branchId], references: [id])
+    branchId     String
+    translations Translation[]
 
     @@id([name, branchId])
+}
+
+model Translation {
+    key   String
+    value String
+
+    branch     ProjectBranch @relation(fields: [branchName, projectId], references: [name, projectId])
+    branchName String
+    projectId  String
+
+    locale     Locale? @relation(fields: [localeName, branchId], references: [name, branchId])
+    localeName String
+    branchId   String
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@id([key, localeName, branchId])
 }
 
 model ApiKey {
