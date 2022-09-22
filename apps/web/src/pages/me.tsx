@@ -3,7 +3,7 @@ import { AppLayout } from "../layouts/AppLayout";
 import { trpc } from "../utils/trpc";
 
 export default function MePage() {
-  const { data } = trpc.useQuery(["user.me"]);
+  const { data } = trpc.me.useQuery();
   return <pre>{JSON.stringify(data, null, 2)}</pre>;
 }
 

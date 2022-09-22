@@ -3,18 +3,23 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { ProjectService } from "../services/ProjectService";
 import { LocaleService } from "../services/LocaleService";
+import { t } from "../trpc";
 
-export const projectRouter = createRouter()
-  .query("getProjectBranch", {
-    input: z.object({
-      id: z.string(),
-      branchName: z.string().nullish(),
-    }),
-    async resolve({ input, ctx }) {
+export const projectRouter = t.router({
+  getProjectBranch: t.procedure
+    .input(
+      z.object({
+        id: z.string(),
+        branchName: z.string().nullish(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
       await ProjectService.hasAccessToProject({ ctx, projectId: input.id });
       const project = await ctx.prisma.project.findUnique({
         where: { id: input.id },
-        include: { branches: { include: { locales: true, localeKeys: true } } },
+        include: {
+          branches: { include: { locales: true, localeKeys: true } },
+        },
       });
       if (!project) throw new TRPCError({ code: "NOT_FOUND" });
 
@@ -27,17 +32,18 @@ export const projectRouter = createRouter()
       if (!selectedBranch) throw new TRPCError({ code: "NOT_FOUND" });
 
       return selectedBranch;
-    },
-  })
-  .mutation("updateKey", {
-    input: z.object({
-      projectId: z.string(),
-      branchName: z.string(),
-      locale: z.string(),
-      key: z.string(),
-      newValue: z.string(),
     }),
-    async resolve({ input, ctx }) {
+  updateKey: t.procedure
+    .input(
+      z.object({
+        projectId: z.string(),
+        branchName: z.string(),
+        locale: z.string(),
+        key: z.string(),
+        newValue: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
       await ProjectService.hasAccessToProject({
         ctx,
         projectId: input.projectId,
@@ -66,13 +72,14 @@ export const projectRouter = createRouter()
           },
         },
       });
-    },
-  })
-  .query("apiKeys", {
-    input: z.object({
-      projectId: z.string(),
     }),
-    async resolve({ input: { projectId }, ctx }) {
+  apiKeys: t.procedure
+    .input(
+      z.object({
+        projectId: z.string(),
+      })
+    )
+    .query(async ({ input: { projectId }, ctx }) => {
       await ProjectService.hasAccessToProject({
         ctx,
         projectId: projectId,
@@ -81,14 +88,15 @@ export const projectRouter = createRouter()
         where: { projectId },
         orderBy: { createdAt: "desc" },
       });
-    },
-  })
-  .mutation("createApiKey", {
-    input: z.object({
-      name: z.string().optional(),
-      projectId: z.string(),
     }),
-    async resolve({ input, ctx }) {
+  createApiKey: t.procedure
+    .input(
+      z.object({
+        name: z.string().optional(),
+        projectId: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
       await ProjectService.hasAccessToProject({
         ctx,
         projectId: input.projectId,
@@ -100,14 +108,19 @@ export const projectRouter = createRouter()
       );
 
       return apiKey;
-    },
-  })
-  .mutation("revokeApikey", {
-    input: z.object({
-      projectId: z.string(),
-      keyId: z.string(),
     }),
-    async resolve({ input: { keyId, projectId }, ctx }) {
+  revokeApikey: t.procedure
+    .input(
+      z.object({
+        projectId: z.string(),
+        keyId: z.string(),
+      })
+    )
+    .mutation(async ({ input: { keyId, projectId }, ctx }) => {
+      await ProjectService.hasAccessToProject({
+        ctx,
+        projectId,
+      });
       await ctx.prisma.project.findFirst({
         where: {
           id: projectId,
@@ -121,5 +134,5 @@ export const projectRouter = createRouter()
           id: keyId,
         },
       });
-    },
-  });
+    }),
+});

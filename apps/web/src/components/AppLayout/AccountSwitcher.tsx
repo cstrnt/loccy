@@ -26,9 +26,7 @@ import { AppRouter } from "../../server/router";
 import { trpc } from "../../utils/trpc";
 
 type ButtonProps = {
-  data: NonNullable<
-    inferProcedureOutput<AppRouter["_def"]["queries"]["user.me"]>
-  >;
+  data: NonNullable<inferProcedureOutput<AppRouter["me"]>>;
 };
 
 export const AccountSwitcherButton = ({
@@ -90,7 +88,9 @@ function changeBranch(newBranchName: string) {
 
 export const AccountSwitcher = () => {
   const router = useRouter();
-  const { data, isLoading } = trpc.useQuery(["user.me"]);
+  const { data, isLoading } = trpc.me.useQuery(null, {
+    cacheTime: 1000 * 60 * 5,
+  });
   const currentProject = data?.projects[0]?.project;
   const currentBranch = router.query.branch as string;
   return (

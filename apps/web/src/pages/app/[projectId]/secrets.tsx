@@ -1,25 +1,22 @@
 import {
   Box,
-  Center,
   Flex,
   Heading,
   IconButton,
   Stack,
   StackDivider,
   Text,
-  useDisclosure,
   useToast,
-  VStack,
 } from "@chakra-ui/react";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 import { useRouter } from "next/router";
 import { ReactElement, useState } from "react";
 import { BiPlus, BiTrash } from "react-icons/bi";
+import { ApiKeyAlert } from "~/components/ApiKeyAlert";
 import { getLocaleProps, useI18n } from "~/utils/locales";
 import { AppLayout } from "../../../layouts/AppLayout";
 import { trpc } from "../../../utils/trpc";
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
-import { ApiKeyAlert } from "~/components/ApiKeyAlert";
 dayjs.extend(relativeTime);
 
 export default function SecretsPage() {
@@ -29,19 +26,12 @@ export default function SecretsPage() {
   const toast = useToast();
   const router = useRouter();
 
-  const { data, refetch } = trpc.useQuery([
-    "projects.apiKeys",
-    {
-      projectId: router.query.projectId as string,
-    },
-  ]);
+  const { data, refetch } = trpc.apiKeys.useQuery({
+    projectId: router.query.projectId as string,
+  });
 
-  const { mutateAsync: remoteCreateApiKey } = trpc.useMutation([
-    "projects.createApiKey",
-  ]);
-  const { mutateAsync: remoteRevokeApikey } = trpc.useMutation([
-    "projects.revokeApikey",
-  ]);
+  const { mutateAsync: remoteCreateApiKey } = trpc.createApiKey.useMutation();
+  const { mutateAsync: remoteRevokeApikey } = trpc.revokeApikey.useMutation();
 
   const createApiKey = async () => {
     if (typeof router.query.projectId !== "string") return;
@@ -49,7 +39,7 @@ export default function SecretsPage() {
       { projectId: router.query.projectId },
       {
         onSuccess() {
-          context.invalidateQueries(["projects.apiKeys"]);
+          context.apiKeys.invalidate();
         },
       }
     );
@@ -67,7 +57,7 @@ export default function SecretsPage() {
             position: "bottom-right",
             title: t("apiKeyRevokeSuccess"),
           });
-          context.invalidateQueries(["projects.apiKeys"]);
+          context.apiKeys.invalidate();
         },
       }
     );

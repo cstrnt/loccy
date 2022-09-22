@@ -26,13 +26,10 @@ export default function MePage() {
     mode: "onChange",
   });
 
-  const { data, refetch } = trpc.useQuery([
-    "projects.getProjectBranch",
-    {
-      id: router.query.projectId as string,
-      branchName: router.query.branch as string,
-    },
-  ]);
+  const { data, refetch } = trpc.getProjectBranch.useQuery({
+    id: router.query.projectId as string,
+    branchName: router.query.branch as string,
+  });
 
   const validateKey = useCallback(
     (value: string, keyName: string) => {
@@ -64,7 +61,7 @@ export default function MePage() {
     [data?.localeKeys]
   );
 
-  const { mutateAsync } = trpc.useMutation(["projects.updateKey"]);
+  const { mutateAsync } = trpc.updateKey.useMutation();
 
   const currentLocaleName =
     data?.locales?.find(

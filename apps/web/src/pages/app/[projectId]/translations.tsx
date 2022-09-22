@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -10,18 +9,16 @@ import {
   Input,
   Select,
   Stack,
-  Text,
   useToast,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { ReactElement, useCallback, useEffect, useState } from "react";
-import { LocaleService } from "~/server/services/LocaleService";
-import { AppLayout } from "../../../layouts/AppLayout";
-import { trpc } from "../../../utils/trpc";
+import { ReactElement, useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { LocaleKey } from "@prisma/client";
+import { LocaleService } from "~/server/services/LocaleService";
 import { getLocaleProps, useI18n } from "~/utils/locales";
 import { redirectGSSP } from "~/utils/redirect";
+import { AppLayout } from "../../../layouts/AppLayout";
+import { trpc } from "../../../utils/trpc";
 
 export default function TranslationsPage() {
   const toast = useToast();
@@ -32,13 +29,10 @@ export default function TranslationsPage() {
     mode: "onChange",
   });
 
-  const { data, refetch } = trpc.useQuery([
-    "projects.getProjectBranch",
-    {
-      id: router.query.projectId as string,
-      branchName: router.query.branch as string,
-    },
-  ]);
+  const { data, refetch } = trpc.getProjectBranch.useQuery({
+    id: router.query.projectId as string,
+    branchName: router.query.branch as string,
+  });
 
   const validateKey = useCallback(
     (value: string, keyName: string) => {
@@ -70,7 +64,7 @@ export default function TranslationsPage() {
     [data?.localeKeys]
   );
 
-  const { mutateAsync } = trpc.useMutation(["projects.updateKey"]);
+  const { mutateAsync } = trpc.updateKey.useMutation();
 
   const currentLocaleName =
     data?.locales?.find(
