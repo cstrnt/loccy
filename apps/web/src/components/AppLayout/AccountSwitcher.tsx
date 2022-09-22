@@ -88,7 +88,7 @@ function changeBranch(newBranchName: string) {
 
 export const AccountSwitcher = () => {
   const router = useRouter();
-  const { data, isLoading } = trpc.me.useQuery(null, {
+  const { data, isLoading } = trpc.me.useQuery(undefined, {
     cacheTime: 1000 * 60 * 5,
   });
   const currentProject = data?.projects[0]?.project;
