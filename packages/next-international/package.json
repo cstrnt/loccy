@@ -1,0 +1,25 @@
+{
+  "name": "@loccy/next-international",
+  "version": "0.3.1",
+  "description": "",
+  "main": "dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsup src/ --dts"
+  },
+  "keywords": [],
+  "author": "Tim Raderschad",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "18.0.0",
+    "tsup": "^6.2.3",
+    "typescript": "4.7.4"
+  },
+  "dependencies": {
+    "@loccy/shared": "workspace:*",
+    "current-git-branch": "^1.1.0"
+  }
+}

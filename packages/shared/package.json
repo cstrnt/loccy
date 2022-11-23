@@ -1,0 +1,33 @@
+{
+  "name": "@loccy/shared",
+  "version": "0.2.1",
+  "description": "",
+  "main": "dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./dist/server": {
+      "import": "./dist/server.mjs",
+      "require": "./dist/server.js",
+      "types": "./dist/server.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsup src/ --dts --format esm,cjs"
+  },
+  "keywords": [],
+  "author": "Tim Raderschad",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "18.0.0",
+    "tsup": "^6.2.3",
+    "typescript": "4.7.4"
+  },
+  "dependencies": {
+    "zod": "^3.18.0"
+  }
+}

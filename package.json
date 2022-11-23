@@ -2,18 +2,17 @@
   "name": "loccy",
   "version": "0.0.0",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
   "scripts": {
     "build": "turbo run build",
+    "build:packages": "turbo run build --no-cache --filter=./packages/*",
     "dev": "turbo run dev --parallel",
     "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "changeset": "pnpm build:packages && pnpm changeset && pnpm changeset version",
+    "release": "pnpm publish -r --access public"
   },
   "devDependencies": {
-    "eslint-config-custom": "workspace:*",
+    "@changesets/cli": "^2.24.4",
     "prettier": "latest",
     "turbo": "latest"
   },
@@ -21,6 +20,5 @@
     "npm": ">=7.0.0",
     "node": ">=14.0.0"
   },
-  "dependencies": {},
   "packageManager": "pnpm@7.9.3"
 }
