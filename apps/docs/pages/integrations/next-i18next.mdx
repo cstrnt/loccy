@@ -14,6 +14,29 @@ pnpm i @loccy/next-i18next
 yarn add @loccy/next-i18next
 ```
 
-### 1 Click Migration
+now you only need to update your `next-i18next.config.js` like this:
 
-`Coming Soon`
+```javascript
+const loccyConfig = require("./loccy.config").default;
+const LoccyBackend = require("@loccy/next-i18next").default;
+
+module.exports = {
+  use: [LoccyBackend],
+  ...LoccyBackend.getRequiredOptions(loccyConfig),
+};
+```
+
+This is the most basic setup needed. If you want to have nice types as well you will have to create
+a `next-i18next.d.ts` file in your project root and add the following content:
+
+```typescript
+import "next-i18next";
+import loccyConfig from "./loccy.config";
+import { inferLocales } from "@loccy/next-i18next";
+
+declare module "next-i18next" {
+  interface Resources extends inferLocales<typeof loccyConfig> {}
+}
+```
+
+Now your app is fully typed!
