@@ -26,4 +26,5 @@ export default {
       <meta name="og:title" content="Nextra: the LMS you will love" />
     </>
   ),
+  unstable_faviconGlyph: "📖",
 };

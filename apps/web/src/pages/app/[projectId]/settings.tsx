@@ -55,4 +55,4 @@ export default function SettingsPage() {
 
 SettingsPage.getLayout = (page: ReactNode) => <AppLayout>{page}</AppLayout>;
 
-export const getServerSideProps = getLocaleProps(withSession);
+export const getServerSideProps = withSession(getLocaleProps());

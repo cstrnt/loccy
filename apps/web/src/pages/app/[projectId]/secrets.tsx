@@ -15,6 +15,7 @@ import { ReactElement, useState } from "react";
 import { BiPlus, BiTrash } from "react-icons/bi";
 import { ApiKeyAlert } from "~/components/ApiKeyAlert";
 import { getLocaleProps, useI18n } from "~/utils/locales";
+import { withSession } from "~/utils/redirect";
 import { AppLayout } from "../../../layouts/AppLayout";
 import { trpc } from "../../../utils/trpc";
 dayjs.extend(relativeTime);
@@ -121,4 +122,4 @@ export default function SecretsPage() {
 
 SecretsPage.getLayout = (page: ReactElement) => <AppLayout>{page}</AppLayout>;
 
-export const getServerSideProps = getLocaleProps();
+export const getServerSideProps = withSession(getLocaleProps());
