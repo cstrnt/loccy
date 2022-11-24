@@ -35,6 +35,7 @@ export default async function pushConfigHandler(
   }
 
   if (!body.success) {
+    console.error(body.error);
     res.status(400).send(body.error);
     return;
   }

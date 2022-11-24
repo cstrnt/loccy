@@ -1,5 +1,11 @@
 # @loccy/cli
 
+## 0.2.1
+
+### Patch Changes
+
+- improve init command
+
 ## 0.2.0
 
 ### Minor Changes
